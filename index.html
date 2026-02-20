@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Korolev CS2 Cup 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --neon-blue: #00d4ff;
+    --neon-purple: #9b30ff;
+    --neon-orange: #ff6b00;
+    --neon-cyan: #00ffcc;
+    --dark: #080c14;
+    --dark2: #0d1220;
+    --dark3: #111827;
+    --text: #e2e8f0;
+    --text-dim: #8899aa;
+    --glow-blue: 0 0 20px rgba(0,212,255,0.6), 0 0 40px rgba(0,212,255,0.3);
+    --glow-orange: 0 0 20px rgba(255,107,0,0.6), 0 0 40px rgba(255,107,0,0.3);
+    --glow-purple: 0 0 20px rgba(155,48,255,0.6), 0 0 40px rgba(155,48,255,0.3);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  /* ── CANVAS BACKGROUND ── */
+  #bg-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* ── SCANLINES ── */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 9998;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(8,12,20,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,212,255,0.15);
+  }
+
+  .nav-logo {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 1.1rem;
+    color: var(--neon-blue);
+    text-shadow: var(--glow-blue);
+    letter-spacing: 2px;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: color 0.2s, text-shadow 0.2s;
+  }
+
+  .nav-links a:hover {
+    color: var(--neon-blue);
+    text-shadow: var(--glow-blue);
+  }
+
+  /* ── HERO ── */
+  #hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6rem 1.5rem 4rem;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.3);
+    color: var(--neon-blue);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 3px;
+    padding: 0.4rem 1.2rem;
+    border-radius: 2px;
+    margin-bottom: 2rem;
+    animation: fadeInDown 0.8s ease both;
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--neon-cyan);
+    box-shadow: 0 0 8px var(--neon-cyan);
+    animation: pulse 1.5s infinite;
+  }
+
+  .hero-title {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: clamp(2.8rem, 9vw, 7rem);
+    line-height: 1;
+    letter-spacing: -1px;
+    margin-bottom: 1.2rem;
+    animation: fadeInUp 0.8s ease 0.2s both;
+  }
+
+  .hero-title .line1 {
+    display: block;
+    background: linear-gradient(135deg, #fff 0%, var(--neon-blue) 50%, var(--neon-purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 30px rgba(0,212,255,0.4));
+  }
+
+  .hero-title .line2 {
+    display: block;
+    color: var(--neon-orange);
+    text-shadow: var(--glow-orange);
+    font-size: 0.55em;
+    letter-spacing: 8px;
+    margin-top: 0.3rem;
+  }
+
+  .hero-sub {
+    font-size: clamp(1rem, 2.5vw, 1.35rem);
+    color: var(--text-dim);
+    max-width: 600px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    line-height: 1.6;
+    margin-bottom: 3rem;
+    animation: fadeInUp 0.8s ease 0.4s both;
+  }
+
+  .hero-sub span { color: var(--neon-cyan); }
+
+  .hero-cta-wrap {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: fadeInUp 0.8s ease 0.6s both;
+  }
+
+  .btn-primary {
+    position: relative;
+    display: inline-block;
+    padding: 1rem 2.8rem;
+    font-family: 'Orbitron', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: #000;
+    background: linear-gradient(90deg, var(--neon-orange), #ff9500);
+    border: none;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: var(--glow-orange), inset 0 1px 0 rgba(255,255,255,0.2);
+    overflow: hidden;
+  }
+
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+    transform: translateX(-100%);
+    transition: transform 0.4s;
+  }
+
+  .btn-primary:hover::after { transform: translateX(100%); }
+  .btn-primary:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 0 35px rgba(255,107,0,0.8), 0 0 60px rgba(255,107,0,0.4); }
+  .btn-primary:active { transform: scale(0.97); }
+
+  .btn-secondary {
+    display: inline-block;
+    padding: 1rem 2.2rem;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--neon-blue);
+    background: transparent;
+    border: 1px solid rgba(0,212,255,0.4);
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover { background: rgba(0,212,255,0.1); border-color: var(--neon-blue); box-shadow: var(--glow-blue); }
+
+  .hero-stats {
+    display: flex;
+    gap: 3rem;
+    margin-top: 5rem;
+    animation: fadeIn 1s ease 1s both;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .hero-stat {
+    text-align: center;
+    position: relative;
+  }
+
+  .hero-stat::after {
+    content: '';
+    position: absolute;
+    right: -1.5rem;
+    top: 20%;
+    height: 60%;
+    width: 1px;
+    background: rgba(0,212,255,0.2);
+  }
+  .hero-stat:last-child::after { display: none; }
+
+  .stat-val {
+    font-family: 'Orbitron', monospace;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--neon-blue);
+    text-shadow: var(--glow-blue);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-top: 0.25rem;
+  }
+
+  /* ── SECTION BASE ── */
+  section {
+    position: relative;
+    z-index: 1;
+    padding: 6rem 1.5rem;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 4px;
+    color: var(--neon-orange);
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+
+  .section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-title .accent { color: var(--neon-blue); }
+
+  /* ── ABOUT ── */
+  #about {
+    background: linear-gradient(180deg, transparent, rgba(13,18,32,0.8), transparent);
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .about-text p {
+    color: var(--text-dim);
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+  }
+
+  .about-text p strong { color: var(--neon-cyan); font-weight: 700; }
+
+  .about-highlights {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .highlight-card {
+    background: rgba(0,212,255,0.04);
+    border: 1px solid rgba(0,212,255,0.12);
+    border-left: 3px solid var(--neon-blue);
+    padding: 1.2rem 1.5rem;
+    border-radius: 2px;
+    transition: all 0.3s;
+  }
+
+  .highlight-card:nth-child(2) { border-left-color: var(--neon-purple); }
+  .highlight-card:nth-child(3) { border-left-color: var(--neon-orange); }
+
+  .highlight-card:hover {
+    background: rgba(0,212,255,0.08);
+    transform: translateX(6px);
+  }
+
+  .hc-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 1px;
+    margin-bottom: 0.3rem;
+  }
+
+  .hc-desc {
+    font-size: 0.95rem;
+    color: var(--text-dim);
+  }
+
+  /* ── FORMAT ── */
+  #format {
+    background: var(--dark2);
+    border-top: 1px solid rgba(155,48,255,0.15);
+    border-bottom: 1px solid rgba(155,48,255,0.15);
+  }
+
+  .format-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+
+  .format-card {
+    position: relative;
+    background: rgba(9,13,25,0.9);
+    border: 1px solid rgba(155,48,255,0.2);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    transition: all 0.3s;
+    overflow: hidden;
+  }
+
+  .format-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--neon-purple), transparent);
+  }
+
+  .format-card:hover {
+    border-color: var(--neon-purple);
+    box-shadow: var(--glow-purple);
+    transform: translateY(-4px);
+  }
+
+  .format-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .format-val {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--neon-purple);
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+
+  .format-desc {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+  }
+
+  /* ── DATES ── */
+  #dates .timeline {
+    position: relative;
+    margin-top: 3rem;
+    padding-left: 2rem;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, var(--neon-blue), var(--neon-purple), var(--neon-orange));
+  }
+
+  .tl-item {
+    position: relative;
+    padding: 0 0 2.5rem 2.5rem;
+  }
+
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -5px;
+    top: 8px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--neon-blue);
+    box-shadow: 0 0 10px var(--neon-blue), 0 0 20px rgba(0,212,255,0.5);
+  }
+
+  .tl-item:nth-child(2)::before { background: var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); }
+  .tl-item:nth-child(3)::before { background: var(--neon-orange); box-shadow: 0 0 10px var(--neon-orange); }
+  .tl-item:nth-child(4)::before { background: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); }
+  .tl-item:nth-child(5)::before { background: var(--neon-purple); box-shadow: 0 0 10px var(--neon-purple); }
+  .tl-item:nth-child(6)::before { background: var(--neon-orange); box-shadow: 0 0 10px var(--neon-orange); }
+
+  .tl-date {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--neon-blue);
+    letter-spacing: 2px;
+    margin-bottom: 0.3rem;
+  }
+
+  .tl-item:nth-child(2) .tl-date { color: var(--neon-purple); }
+  .tl-item:nth-child(3) .tl-date { color: var(--neon-orange); }
+  .tl-item:nth-child(4) .tl-date { color: var(--neon-cyan); }
+  .tl-item:nth-child(5) .tl-date { color: var(--neon-purple); }
+  .tl-item:nth-child(6) .tl-date { color: var(--neon-orange); }
+
+  .tl-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.3rem;
+  }
+
+  .tl-desc { font-size: 0.95rem; color: var(--text-dim); }
+
+  /* ── PRIZES ── */
+  #prizes {
+    background: linear-gradient(180deg, transparent, rgba(255,107,0,0.03), transparent);
+  }
+
+  .prizes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 3rem;
+    align-items: end;
+  }
+
+  .prize-card {
+    background: rgba(9,13,25,0.95);
+    border: 1px solid rgba(0,212,255,0.1);
+    text-align: center;
+    padding: 2rem 1rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+
+  .prize-card.gold {
+    border-color: rgba(255,200,0,0.4);
+    transform: scale(1.05);
+    background: rgba(15,12,5,0.95);
+    box-shadow: 0 0 30px rgba(255,200,0,0.15);
+  }
+
+  .prize-card.gold::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #ffd700, transparent);
+  }
+
+  .prize-place {
+    font-family: 'Orbitron', monospace;
+    font-size: 3rem;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .prize-card.gold .prize-place { color: #ffd700; text-shadow: 0 0 20px rgba(255,215,0,0.6); }
+  .prize-card.silver .prize-place { color: #c0c0c0; }
+  .prize-card.bronze .prize-place { color: #cd7f32; }
+
+  .prize-label {
+    font-size: 0.8rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+  }
+
+  .prize-amount {
+    font-family: 'Orbitron', monospace;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--neon-orange);
+    text-shadow: var(--glow-orange);
+  }
+
+  .prize-extra {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    margin-top: 0.5rem;
+  }
+
+  /* ── RULES ── */
+  #rules {
+    background: var(--dark2);
+    border-top: 1px solid rgba(0,212,255,0.1);
+  }
+
+  .rules-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-top: 3rem;
+  }
+
+  .rules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .rule-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background: rgba(0,212,255,0.03);
+    border-left: 2px solid rgba(0,212,255,0.3);
+  }
+
+  .rule-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--neon-blue);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .rule-text { font-size: 0.95rem; color: var(--text-dim); line-height: 1.5; }
+  .rule-text strong { color: var(--text); }
+
+  .rules-cta {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+
+  .rules-cta p {
+    font-size: 1.1rem;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+
+  /* ── FAQ ── */
+  #faq .faq-list {
+    margin-top: 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .faq-item {
+    background: rgba(9,13,25,0.9);
+    border: 1px solid rgba(0,212,255,0.1);
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .faq-item.open { border-color: rgba(0,212,255,0.35); }
+
+  .faq-q {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 1.5rem;
+    cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 0.3px;
+    user-select: none;
+  }
+
+  .faq-q:hover { color: var(--neon-blue); }
+
+  .faq-arrow {
+    font-size: 1.2rem;
+    color: var(--neon-blue);
+    transition: transform 0.3s;
+    flex-shrink: 0;
+  }
+
+  .faq-item.open .faq-arrow { transform: rotate(45deg); }
+
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, padding 0.35s ease;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    padding: 0 1.5rem;
+  }
+
+  .faq-item.open .faq-a {
+    max-height: 300px;
+    padding: 0 1.5rem 1.2rem;
+  }
+
+  /* ── CONTACTS ── */
+  #contacts {
+    background: var(--dark2);
+    border-top: 1px solid rgba(155,48,255,0.15);
+  }
+
+  .contacts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+
+  .contact-card {
+    background: rgba(9,13,25,0.9);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 2rem;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    transition: all 0.3s;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  }
+
+  .contact-card.tg { border-color: rgba(0,136,204,0.3); }
+  .contact-card.vk { border-color: rgba(0,119,255,0.3); }
+  .contact-card.ph { border-color: rgba(255,107,0,0.3); }
+
+  .contact-card:hover { transform: translateY(-6px); }
+  .contact-card.tg:hover { box-shadow: 0 0 25px rgba(0,136,204,0.3); }
+  .contact-card.vk:hover { box-shadow: 0 0 25px rgba(0,119,255,0.3); }
+  .contact-card.ph:hover { box-shadow: 0 0 25px rgba(255,107,0,0.3); }
+
+  .contact-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .contact-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    margin-bottom: 0.4rem;
+    text-transform: uppercase;
+  }
+
+  .contact-val {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .contact-card.tg .contact-val { color: #29b6f6; }
+  .contact-card.vk .contact-val { color: #5c9dfa; }
+  .contact-card.ph .contact-val { color: var(--neon-orange); }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 2rem 1rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  footer span { color: var(--neon-orange); }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(25px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .about-grid, .rules-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .prizes-grid { grid-template-columns: 1fr; }
+    .prize-card.gold { transform: none; }
+    .contacts-grid { grid-template-columns: 1fr; }
+    .format-grid { grid-template-columns: 1fr 1fr; }
+    .hero-stats { gap: 1.5rem; }
+    .stat-val { font-size: 1.8rem; }
+  }
+
+  /* Glitch */
+  .glitch {
+    position: relative;
+  }
+  .glitch::before, .glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+  .glitch::before {
+    animation: glitch1 3s infinite linear alternate-reverse;
+    clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+    -webkit-text-fill-color: rgba(0,212,255,0.5);
+    transform: translateX(-2px);
+  }
+  .glitch::after {
+    animation: glitch2 2.5s infinite linear alternate-reverse;
+    clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+    -webkit-text-fill-color: rgba(255,107,0,0.5);
+    transform: translateX(2px);
+  }
+  @keyframes glitch1 {
+    0%,90%,100% { transform: translateX(0); opacity: 0; }
+    91%,99% { transform: translateX(-3px); opacity: 1; }
+  }
+  @keyframes glitch2 {
+    0%,88%,100% { transform: translateX(0); opacity: 0; }
+    89%,99% { transform: translateX(3px); opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">KRL//CS2</div>
+  <ul class="nav-links">
+    <li><a href="#about">О турнире</a></li>
+    <li><a href="#format">Формат</a></li>
+    <li><a href="#dates">Даты</a></li>
+    <li><a href="#rules">Правила</a></li>
+    <li><a href="#contacts">Контакты</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-badge">🔴 РЕГИСТРАЦИЯ ОТКРЫТА · ГОРОД КОРОЛЁВ · АПРЕЛЬ 2026</div>
+  <h1 class="hero-title">
+    <span class="line1 glitch" data-text="Korolev CS2 Cup">Korolev CS2 Cup</span>
+    <span class="line2">2026</span>
+  </h1>
+  <p class="hero-sub">
+    Главный турнир по CS2 среди команд города Королёв.<br>
+    Собери пятёрку. Докажи свой скилл. <span>Стань легендой Города.</span>
+  </p>
+  <div class="hero-cta-wrap">
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLScCQoUQYoIMLIx9IH2s4TalsH0hyZeK2OCcLUJ-WNoedt4Ung/viewform?usp=dialog" class="btn-primary" target="_blank">⚡ Зарегистрироваться</a>
+    <a href="#about" class="btn-secondary">Подробнее</a>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="stat-val">100</div>
+      <div class="stat-label">Команд</div>
+    </div>
+    <div class="hero-stat">
+      <div class="stat-val">5×5</div>
+      <div class="stat-label">Формат</div>
+    </div>
+    <div class="hero-stat">
+      <div class="stat-val">LAN</div>
+      <div class="stat-label">Финал</div>
+    </div>
+    <div class="hero-stat">
+      <div class="stat-val">АПР</div>
+      <div class="stat-label">2026</div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="container">
+    <div class="about-grid reveal">
+      <div class="about-text">
+        <p class="section-label">// О турнире</p>
+        <h2 class="section-title">Это <span class="accent">не просто</span><br>пати-матч</h2>
+        <p>
+          <strong>Korolev CS2 Cup 2026</strong> — официальный городской турнир для школьников Королёва и ближайших районов. До 100 команд. Это твой шанс доказать, что ты не просто «норм играешь».
+        </p>
+        <p>
+          Собери команду из пяти человек, пройди групповой этап, выйди в плей-офф и побори за реальные деньги и звание лучших в городе.
+        </p>
+        <p>
+          Без читов. Без рандома. Только честная игра, тактика и командная работа.
+        </p>
+      </div>
+      <div class="about-highlights">
+        <div class="highlight-card">
+          <div class="hc-title">🏆 Реальные призы</div>
+          <div class="hc-desc">Денежные выплаты, мерч и сертификаты победителям. Не просто достижение в стиме.</div>
+        </div>
+        <div class="highlight-card">
+          <div class="hc-title">👥 Для всех уровней</div>
+          <div class="hc-desc">Открыто для школьников с 14 лет и студентов. Рейтинг не важен — важна команда.</div>
+        </div>
+        <div class="highlight-card">
+          <div class="hc-title">🎮 Честные условия</div>
+          <div class="hc-desc">Единые правила, судьи на каждом матче, демозаписи всех игр. Никаких договорняков.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORMAT -->
+<section id="format">
+  <div class="container reveal">
+    <p class="section-label">// Формат</p>
+    <h2 class="section-title">Как это <span class="accent">работает</span></h2>
+    <div class="format-grid">
+      <div class="format-card">
+        <span class="format-icon">🎮</span>
+        <span class="format-val">5 × 5</span>
+        <div class="format-desc">Классический<br>формат CS2</div>
+      </div>
+      <div class="format-card">
+        <span class="format-icon">📋</span>
+        <span class="format-val">100</span>
+        <div class="format-desc">Команд<br>в турнире</div>
+      </div>
+      <div class="format-card">
+        <span class="format-icon">🌐</span>
+        <span class="format-val">ONLINE</span>
+        <div class="format-desc">Отборочные +<br>групповой этап</div>
+      </div>
+      <div class="format-card">
+        <span class="format-icon">🏆</span>
+        <span class="format-val">LAN</span>
+        <div class="format-desc">Плей-офф<br>вживую</div>
+      </div>
+      <div class="format-card">
+        <span class="format-icon">⚔️</span>
+        <span class="format-val">SE</span>
+        <div class="format-desc">Плей-офф<br>Single Elim</div>
+      </div>
+      <div class="format-card">
+        <span class="format-icon">✅</span>
+        <span class="format-val">FAIR</span>
+        <div class="format-desc">Честные правила<br>и античит</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DATES -->
+<section id="dates">
+  <div class="container reveal">
+    <p class="section-label">// Расписание</p>
+    <h2 class="section-title">Ключевые <span class="accent">даты</span></h2>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-date">20 ФЕВ — 1 АПР 2026</div>
+        <div class="tl-title">Регистрация команд</div>
+        <div class="tl-desc">Заполни форму, укажи состав 5 игроков. Замены не предусмотрены. Регистрация бесплатна.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">1 — 3 АПР 2026</div>
+        <div class="tl-title">Жеребьёвка групп</div>
+        <div class="tl-desc">Прямой эфир в Telegram. Узнай своих первых соперников.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">5 — 8 АПР 2026 · ОНЛАЙН</div>
+        <div class="tl-title">Групповой этап</div>
+        <div class="tl-desc">2 группы по 7 команд. Топ-4 из каждой группы выходят в плей-офф, остальные покидают турнир.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">10 — 11 АПР 2026 · LAN</div>
+        <div class="tl-title">Плей-офф · Четвертьфинал</div>
+        <div class="tl-desc">1/4 стадия — 8 команд сражаются вживую за выход в полуфинал.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">13 АПР 2026 · LAN</div>
+        <div class="tl-title">Полуфинал</div>
+        <div class="tl-desc">4 команды. Двое идут дальше — двое уходят домой.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-date">14 АПР 2026 · LAN</div>
+        <div class="tl-title">🏆 Финал</div>
+        <div class="tl-desc">Главный матч турнира. Зрители, стрим, чемпионы города.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RULES -->
+<section id="rules">
+  <div class="container">
+    <div class="rules-grid reveal">
+      <div>
+        <p class="section-label">// Правила</p>
+        <h2 class="section-title">Главное<br><span class="accent">знать</span></h2>
+        <div class="rules-list">
+          <div class="rule-item">
+            <div class="rule-num">[01]</div>
+            <div class="rule-text"><strong>Возраст участников:</strong> любой — главное, чтобы ты учился в школе.</div>
+          </div>
+          <div class="rule-item">
+            <div class="rule-num">[02]</div>
+            <div class="rule-text"><strong>Состав:</strong> ровно 5 основных игроков. Замены не предусмотрены.</div>
+          </div>
+          <div class="rule-item">
+            <div class="rule-num">[03]</div>
+            <div class="rule-text"><strong>Карты:</strong> официальный пул CS2. Выбор карты по договорённости или монетке.</div>
+          </div>
+          <div class="rule-item">
+            <div class="rule-num">[04]</div>
+            <div class="rule-text"><strong>Читы и нечестная игра:</strong> немедленная дисквалификация без апелляции.</div>
+          </div>
+          <div class="rule-item">
+            <div class="rule-num">[05]</div>
+            <div class="rule-text"><strong>Споры:</strong> решает судья. Демо сохраняются на весь турнир.</div>
+          </div>
+        </div>
+      </div>
+      <div class="rules-cta">
+        <p>Полный регламент турнира содержит все нюансы по форматам матчей, тайм-аутам, дисциплинарным мерам и процедуре подачи апелляций.</p>
+        <a href="https://drive.google.com/file/d/15d1uvdcAc2kavKZkdSp-wHSI6kR--hxk/view?usp=drive_link" class="btn-primary" style="text-decoration:none" target="_blank">📄 Скачать PDF-регламент</a>
+        <p style="font-size:0.85rem; color: var(--text-dim);">Незнание правил не освобождает от ответственности — прочитай перед стартом.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACTS -->
+<section id="contacts">
+  <div class="container reveal">
+    <p class="section-label">// Контакты</p>
+    <h2 class="section-title">Свяжись с<br><span class="accent">организатором</span></h2>
+    <div class="contacts-grid">
+      <a href="https://t.me/korolev_cs2cup" class="contact-card tg" target="_blank">
+        <span class="contact-icon">✈️</span>
+        <div class="contact-label">Telegram (канал)</div>
+        <div class="contact-val">@korolev_cs2cup</div>
+      </a>
+      <a href="https://t.me/org_c2cup" class="contact-card tg" target="_blank">
+        <span class="contact-icon">✈️</span>
+        <div class="contact-label">Telegram (орг)</div>
+        <div class="contact-val">@org_c2cup</div>
+      </a>
+      <a href="mailto:lol_mishawaa@mail.ru" class="contact-card ph">
+        <span class="contact-icon">📧</span>
+        <div class="contact-label">Почта</div>
+        <div class="contact-val">lol_mishawaa@mail.ru</div>
+      </a>
+    </div>
+
+    <!-- Final CTA -->
+    <div style="text-align:center; margin-top: 5rem; padding: 3rem; background: rgba(0,212,255,0.04); border: 1px solid rgba(0,212,255,0.15); position: relative; overflow: hidden;">
+      <div style="position:absolute; top:-50px; left:50%; transform:translateX(-50%); width:300px; height:300px; background: radial-gradient(circle, rgba(0,212,255,0.08), transparent 70%); pointer-events:none;"></div>
+      <p class="section-label" style="margin-bottom:1rem;">// НЕ УПУСТИ ШАНС</p>
+      <h2 style="font-family:'Orbitron',monospace; font-size: clamp(1.5rem,4vw,2.5rem); font-weight:900; margin-bottom:1rem; color:#fff;">
+        Осталось мест: <span style="color:var(--neon-orange); text-shadow: var(--glow-orange);">100 из 100</span>
+      </h2>
+      <p style="color:var(--text-dim); margin-bottom:2rem; max-width:500px; margin-left:auto; margin-right:auto;">
+        Регистрация закрывается 1 апреля или когда наберётся 100 команд. Не тяни.
+      </p>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLScCQoUQYoIMLIx9IH2s4TalsH0hyZeK2OCcLUJ-WNoedt4Ung/viewform?usp=dialog" class="btn-primary" target="_blank" style="font-size:1.15rem; padding: 1.2rem 3.5rem;">⚡ Зарегистрироваться сейчас</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 <span>Korolev CS2 Cup</span> · Королёв, Московская область · Все права защищены</p>
+  <p style="margin-top:0.5rem; font-size:0.7rem; opacity:0.5;">Counter-Strike 2 является торговой маркой Valve Corporation. Турнир не аффилирован с Valve.</p>
+</footer>
+
+<script>
+// ── PARTICLE CANVAS ──
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [], lines = [];
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+const COLORS = ['rgba(0,212,255,', 'rgba(155,48,255,', 'rgba(255,107,0,', 'rgba(0,255,204,'];
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.vx = (Math.random() - 0.5) * 0.4;
+    this.vy = (Math.random() - 0.5) * 0.4;
+    this.r = Math.random() * 1.5 + 0.5;
+    this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+    this.alpha = Math.random() * 0.5 + 0.2;
+  }
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+  }
+  draw() {
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fillStyle = this.color + this.alpha + ')';
+    ctx.fill();
+  }
+}
+
+// Diagonal grid lines
+function drawGrid() {
+  ctx.save();
+  ctx.strokeStyle = 'rgba(0,212,255,0.04)';
+  ctx.lineWidth = 1;
+  const step = 80;
+  for (let x = 0; x < W + H; x += step) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x - H, H);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// Init particles
+for (let i = 0; i < 120; i++) particles.push(new Particle());
+
+// Connection lines
+function drawConnections() {
+  const maxDist = 120;
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      if (d < maxDist) {
+        const alpha = (1 - d / maxDist) * 0.15;
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(0,212,255,${alpha})`;
+        ctx.lineWidth = 0.5;
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+// Glow orbs
+const orbs = [
+  { x: 0.15, y: 0.3, c: '0,212,255', r: 300 },
+  { x: 0.85, y: 0.2, c: '155,48,255', r: 250 },
+  { x: 0.5,  y: 0.7, c: '255,107,0',  r: 200 },
+];
+
+function drawOrbs() {
+  orbs.forEach(o => {
+    const grd = ctx.createRadialGradient(o.x*W, o.y*H, 0, o.x*W, o.y*H, o.r);
+    grd.addColorStop(0, `rgba(${o.c},0.08)`);
+    grd.addColorStop(1, `rgba(${o.c},0)`);
+    ctx.beginPath();
+    ctx.fillStyle = grd;
+    ctx.arc(o.x*W, o.y*H, o.r, 0, Math.PI*2);
+    ctx.fill();
+  });
+}
+
+function animate() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Dark gradient bg
+  const bg = ctx.createLinearGradient(0, 0, W, H);
+  bg.addColorStop(0, '#080c14');
+  bg.addColorStop(0.5, '#0a0f1e');
+  bg.addColorStop(1, '#080c14');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  drawOrbs();
+  drawGrid();
+  drawConnections();
+  particles.forEach(p => { p.update(); p.draw(); });
+  requestAnimationFrame(animate);
+}
+animate();
+
+// ── FAQ ──
+document.querySelectorAll('.faq-q').forEach(q => {
+  q.addEventListener('click', () => {
+    const item = q.parentElement;
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  });
+});
+
+// ── SCROLL REVEAL ──
+const revealEls = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+revealEls.forEach(el => observer.observe(el));
+
+// ── CURSOR TRAIL ──
+const trail = [];
+document.addEventListener('mousemove', e => {
+  trail.push({ x: e.clientX, y: e.clientY, t: Date.now() });
+  if (trail.length > 20) trail.shift();
+});
+</script>
+</body>
+</html>
